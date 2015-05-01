@@ -1,0 +1,8 @@
+Flask==0.10.1
+Sphinx==1.2.2
+Werkzeug==0.9.4
+celery==3.1.15
+requests==2.6
+pyrabbit==1.0.1
+PyJWT==0.4.3
+python-novaclient
