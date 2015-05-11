@@ -10,7 +10,7 @@ Licenses used
 :Apache v2: http://www.apache.org/licenses/LICENSE-2.0.html
 :MIT: http://opensource.org/licenses/MIT
 
-For licenses requiring files see in : https://github.com/ServiceGateway/JASS/tree/master/third-party-licenses
+For licenses requiring files see in : https://github.com/crim-ca/ServiceGateway/tree/master/third-party-licenses
 
 ###################################
 The license for python dependencies
