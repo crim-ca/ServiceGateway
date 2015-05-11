@@ -1,5 +1,5 @@
 The license for this application can be found under: 
-https://github.com/crim-ca/JASS/tree/master/LICENSE
+https://github.com/crim-ca/ServiceGateway/tree/master/LICENSE
 
 #############
 Licenses used
@@ -24,7 +24,7 @@ The license for python dependencies
 :pyrabbit: MIT. https://pypi.python.org/pypi/pyrabbit
 :PyJWT: MIT. https://pypi.python.org/pypi/PyJWT/0.4.3
 :python-novaclient: Apache v2. https://pypi.python.org/pypi/python-novaclient#downloads
-
+:VestaRestPackage: Apache v2. https://github.com/crim-ca/RESTPackage
 
 ################
 For applications
