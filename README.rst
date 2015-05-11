@@ -1,3 +1,7 @@
+===================================================
+NEP-143-2 SG (Service Gateway)
+===================================================
+
 This package offers a simple load balancer residing behind a REST API. 
 
 It's intended use is for the exploitation of services on the CANARIE network
@@ -30,6 +34,13 @@ and `RabbitMQ <http://www.rabbitmq.com/>`_ messaging broker to dispatch
 processing requests. Also, the REST interface uses the `Flask
 <http://flask.pocoo.org/>`_ WEB framework.
 
+-------
+LICENSE
+-------
+
+see https://github.com/crim-ca/ServiceGateway/tree/master/LICENSE.rst
+
+------------
 Installation
 ------------
 
