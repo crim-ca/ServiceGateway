@@ -38,7 +38,7 @@ processing requests. Also, the REST interface uses the `Flask
 LICENSE
 -------
 
-see https://github.com/crim-ca/ServiceGateway/tree/master/THIRD-PARTY-LICENSES.rst
+see https://github.com/crim-ca/ServiceGateway/tree/master/THIRD_PARTY_LICENSES.rst
 
 ------------
 Installation
