@@ -1,19 +1,8 @@
-The license for this application can be found under: 
+The license for this application can be found under:
 https://github.com/crim-ca/ServiceGateway/tree/master/LICENSE
 
-#############
-Licenses used
-#############
-
-:BSD: http://en.wikipedia.org/wiki/BSD_licenses
-:Python Software Foundation License: http://opensource.org/licenses/Python-2.0
-:Apache v2: http://www.apache.org/licenses/LICENSE-2.0.html
-:MIT: http://opensource.org/licenses/MIT
-
-For licenses requiring files see in : https://github.com/crim-ca/ServiceGateway/tree/master/third-party-licenses
-
 ###################################
-The license for python dependencies
+The license for dependencies
 ###################################
 
 :Flask: BSD. http://flask.pocoo.org/docs/0.10/license/
@@ -26,12 +15,13 @@ The license for python dependencies
 :python-novaclient: Apache v2. https://pypi.python.org/pypi/python-novaclient#downloads
 :VestaRestPackage: Apache v2. https://github.com/crim-ca/RESTPackage
 
+VestaLoadBalancer reuse classes from the cloud-scheduler project
+
+:cloud-scheduler: https://github.com/hep-gc/cloud-scheduler/blob/master/LICENSE
+
+
 ################
 For applications
 ################
+
 :supervisor: https://github.com/Supervisor/supervisor/blob/master/LICENSES.txt
-
-
-
-
-
