@@ -14,7 +14,7 @@ with open('README.rst') as readme_file:
     README = readme_file.read()
     DESC = README.split('\n')[0]
 
-with open('HISTORY.rst') as history_file:
+with open('RELEASE_NOTES.rst') as history_file:
     HISTORY = history_file.read().replace('.. :changelog:', '')
 
 from VestaLoadBalancer.__meta__ import __version__, __author__, __contact__
