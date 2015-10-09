@@ -1,6 +1,5 @@
-===================================================
 NEP-143-2 SG (Service Gateway)
-===================================================
+==============================
 
 This package offers a simple load balancer residing behind a REST API. 
 
@@ -11,22 +10,23 @@ REST client and better reactivity of the interface itself.
 
 The different functions offered by this code base are the following: 
 
- * Provide a unified CANARIE REST interface for a collection of given services
-   on a given infrastructure.
+* Provide a unified CANARIE REST interface for a collection of given services
+  on a given infrastructure.
 
- * Provide a gateway to a queue-based distributed processing framework based on
-   AMQP and Celery
+* Provide a gateway to a queue-based distributed processing framework based on
+  AMQP and Celery
 
-   * A collection of utilities to aid in adding new worker types to the
-     processing queues.
-   * Implements a standard messaging scheme for workers / controller.
+  * A collection of utilities to aid in adding new worker types to the
+    processing queues.
+  * Implements a standard messaging scheme for workers / controller.
+  * Passes arbitrary arguments onwards to the selected worker.
 
- * Provide an asynchronous API to query the advancement of long duration
-   tasks.
+* Provide an asynchronous API to query the advancement of long duration
+  tasks.
 
-   * Exposes methods to communicate progress [0-100] to the REST front-end.
+  * Exposes methods to communicate progress [0-100] to the REST front-end.
 
- * Provides methods to evaluate infrastructure needs.
+* Provides methods to evaluate infrastructure needs.
 
 This solution relies on the `Celery
 <http://celery.readthedocs.org/en/latest/index.html>`_ distributed task queue
@@ -34,13 +34,12 @@ and `RabbitMQ <http://www.rabbitmq.com/>`_ messaging broker to dispatch
 processing requests. Also, the REST interface uses the `Flask
 <http://flask.pocoo.org/>`_ WEB framework.
 
--------
-LICENSE
+License
 -------
 
-see https://github.com/crim-ca/ServiceGateway/tree/master/THIRD_PARTY_LICENSES.rst
+See:
+https://github.com/crim-ca/ServiceGateway/tree/master/THIRD_PARTY_LICENSES.rst
 
-------------
 Installation
 ------------
 
@@ -50,6 +49,11 @@ install this package. One way of doing that is by pointing pip directly to the
 directory containing the setup.py file such as::
 
    pip install .
+
+Alternatively, one can use the public repository of this project for
+installation by pip such as::
+
+    pip install git@github.com:crim-ca/ServiceGateway.git
 
 This will install the VestaLoadBalancer along with program entry points for
 various utilities.
@@ -73,7 +77,7 @@ This command can launch a built-in Flask WEB server. The
 automatic reloading of code and stack trace forwarding. See the Flask
 documentation for more information.
 
-.. warning::
+.. Warning::
 
    The REST interface in run_local / debug mode uses a built-in Web Server. While
    this Web Server is useful for a closed environment, it is not recommended as a
@@ -83,7 +87,11 @@ documentation for more information.
    `GUnicorn <http://gunicorn.org/>`_ behind a reverse-proxy server such as
    NGinx.
 
-On another terminal still::
+
+Command line usage
+++++++++++++++++++
+
+In a new terminal window, issue the following command::
 
    curl http://localhost:5000/annotator/annotate --data-urlencode doc_url=http://some.url.wav --data-urlencode ann_doc_id=<ann_doc_id> --header "Authorization: <JWT key>"
 
@@ -103,13 +111,18 @@ indicates the location of a document to process. A uuid would then be returned
 and a task request should have been sent on the worker queue where a service
 worker could have consumed the request and launched the processing. 
 
-When complete, the annotations will be available through the status route. See
-documentation.
+When complete, the annotations will be available through the *status* route.
+The *status* route can be invoked as follows::
 
-If the optional ann_doc_id argument is supplied, the worker will post the
-annotations on an annotation storage service for the given annotation document
-UUID. If an error occurred when trying to store the annotations, the worker task
-would have failed and the annotation process result would be lost.
+   curl http://localhost:5000/annotator/status\?uuid=<UUID>
+
+See documentation for more details.
+
+When invoking the *annotate* route, if the optional ann_doc_id argument is
+supplied, the worker will post the annotations on an annotation storage service
+for the given annotation document UUID. If an error occurred when trying to
+store the annotations, the worker task would have failed and the annotation
+process result would be lost.
 
 Furthermore, Celery provides a monitor which can be viewed through a WEB
 interface and which also provides a REST API which can be used to monitor and
