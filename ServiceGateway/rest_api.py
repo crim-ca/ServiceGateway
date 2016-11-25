@@ -1,14 +1,12 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python2.7
 # coding:utf-8
 
 # N.B. : Some of these docstrings are written in reSTructured format so that
 # Sphinx can use them directly with fancy formatting.
 
 """
-This module defines a REST API for the load balancer as defined by the CANARIE
-API specification. See :
-https://collaboration.canarie.ca/elgg/file/download/849
-,[Ma,[Ma,
+A REST API for Celery workers.
+
 Any incoming request on the REST interface is passed on to the Celery
 distributed worker queue and any service workers listening on the corresponding
 queue should pick up the request message and initiate their task.
@@ -24,19 +22,20 @@ import logging
 import os
 
 # -- 3rd party ---------------------------------------------------------------
-from flask import request
+from flask import request, jsonify
+from dicttoxml import dicttoxml
 import jinja2
 
 # -- Project specific --------------------------------------------------------
 from .VestaRestPackage.request_authorisation import validate_authorisation
-from .VestaRestPackage.generic_rest_api import configure_home_route
-from .VestaRestPackage.utility_rest import get_request_url
-from .VestaRestPackage.utility_rest import submit_task
-from .VestaRestPackage.utility_rest import uuid_task
+from .VestaRestPackage.utility_rest import (request_wants_xml,
+                                            get_request_url,
+                                            submit_task,
+                                            uuid_task)
 from .VestaRestPackage.generic_rest_api import APP
 from . import __meta__  # Not really used here but __meta__ needs to be updated
 
-# Add the VLB templates folder to the template loader directories
+# Add the SG templates folder to the template loader directories
 # (VRP one is used by default)
 TEMPLATES_LOADER = jinja2.ChoiceLoader([
     APP.jinja_loader,
@@ -46,12 +45,18 @@ TEMPLATES_LOADER = jinja2.ChoiceLoader([
 APP.jinja_loader = TEMPLATES_LOADER
 
 
+@APP.route("/<service_route>/process", methods=['POST'])
+@APP.route("/<service_route>/process/<storage_doc_id>",
+           methods=['POST'])
 @APP.route("/<service_route>/annotate", methods=['POST'])
 @APP.route("/<service_route>/annotate/<storage_doc_id>",
            methods=['POST'])
 def annotate(service_route, storage_doc_id=None):
     """
-    POST a transcoding request through a form
+    POST a processing request through a form
+
+    In the POST multi-part form document upload there can be a field called
+    payload which contents will be passed onto the worker itself.
 
     :param storage_doc_id: The unique document ID of the file to transcode.
                            If not provided, a doc_url parameter must be
@@ -96,8 +101,12 @@ def uuid_task_route(service_route, task):
     if task == 'cancel':
         validate_authorisation(request, APP.config["SECURITY"])
     logger.info("Got %s request for %s", task, service_route)
-    return uuid_task(task, service_route)
+    state = uuid_task(task, service_route)
 
-
-if __name__ != "__main__":
-    configure_home_route()
+    if request_wants_xml():
+        logger.debug("Rendering result as XML")
+        r_val = dicttoxml(state, attr_type=False, custom_root="process_status")
+    else:
+        logger.debug("Rendering result as JSON")
+        r_val = jsonify(state)
+    return r_val
