@@ -25,8 +25,8 @@ import os
 from requests import post, put, get
 
 # -- Project specific --------------------------------------------------------
-from VestaLoadBalancer.VestaRestPackage.jwt_ import generate_token
-from VestaLoadBalancer.VestaRestPackage.app_objects import APP
+from ServiceGateway.VestaRestPackage.jwt_ import generate_token
+from ServiceGateway.VestaRestPackage.app_objects import APP
 from .exceptions import ServiceError, UnknownService
 
 # -- Configuration shorthands ------------------------------------------------
@@ -96,14 +96,20 @@ def mss_get_upload_url(file_path):
     """
     logger = logging.getLogger(__name__)
 
-    signature_key = APP.config['SECURITY']['JWT']['JWT_SIGNATURE_KEY']
-    audience = APP.config['SECURITY']['JWT']['JWT_AUDIENCE']
-    algorithm = APP.config['SECURITY']['JWT']['JWT_ALGORITHM']
-    token = generate_token(signature_key, audience, algorithm, duration=600)
+    if not APP.config['SECURITY'].get('BYPASS_SECURITY', False):
+        logger.info("Getting token")
+        signature_key = APP.config['SECURITY']['JWT']['JWT_SIGNATURE_KEY']
+        audience = APP.config['SECURITY']['JWT']['JWT_AUDIENCE']
+        algorithm = APP.config['SECURITY']['JWT']['JWT_ALGORITHM']
+        token = generate_token(signature_key, audience, algorithm,
+                               duration=600)
+
+        header = {"content-type": 'application/json',
+                  "Authorization": token}
+    else:
+        header = {"content-type": 'application/json'}
 
     logger.info("Obtaining upload URL for MSS")
-    header = {"content-type": 'application/json',
-              "Authorization": token}
     filename = basename(file_path)
     params = {'filename': filename}
     logger.debug("MSS URL is %s", MSS_URL)
@@ -114,19 +120,27 @@ def mss_get_upload_url(file_path):
     logger.info("body: %s", resp.text)
     storage_doc_id = resp_json['storage_doc_id']
     upload_url = resp_json['upload_url']
+
+    if "TEST_SWIFT" in APP.config:
+        from_ = "swift:8080"
+        swift_redirect = APP.config['TEST_SWIFT']
+        logger.info("Changing %s for %s in URL", from_, swift_redirect)
+        upload_url = upload_url.replace(from_, swift_redirect)
+
     return (storage_doc_id, upload_url)
 
 
 def upload_doc_post(file_path):
     """
-    Upload a document to MSS
+    Upload a document to MSS using a direct POST method.
+
+    Deletion of the resulting file is of the responsibility of the caller.
     """
     logger = logging.getLogger(__name__)
     logger.debug("Uploading file %s", file_path)
-    # storage_doc_id, upload_url = mss_get_upload_url(file_path)
     upload_url = APP.config['POST_STORAGE_DOC_REQ_URL']
     files = {'file': open(file_path, 'rb')}
-    logger.info("Putting document contents")
+    logger.info("Putting document contents of file {0}".format(file_path))
     resp = post(upload_url, files=files)
     logger.info("POST to MSS response : %s", resp)
     logger.info("POST to MSS body: {b}".format(b=resp.text))
@@ -148,13 +162,15 @@ def delete(storage_doc_id):
 
 def upload_doc(file_path):
     """
-    Upload a document to MSS
+    Upload a document to MSS using the compound GET method.
 
     Deletion of the resulting file is of the responsibility of the caller.
     """
     logger = logging.getLogger(__name__)
+    logger.info("Getting temp URL from MSS / Swift")
     storage_doc_id, upload_url = mss_get_upload_url(file_path)
     data = open(file_path, 'rb')
+    logger.info("PUTting ressource to %s", upload_url)
     resp = put(upload_url, data=data)
     logger.info("PUT to MSS response : %s", resp)
     logger.info("PUT to MSS body: %s", resp.text)
@@ -168,8 +184,9 @@ def get_doc(storage_doc_id):
     """
     logger = logging.getLogger(__name__)
     resp = get("{0}/get/{1}".format(MSS_URL, storage_doc_id))
-    logger.info("GET to get on MSS response : %s", resp)
+    logger.info("GET from MSS response : %s", resp)
     resp.raise_for_status()
+    logger.debug("Redirect URL from MSS response : %s", resp.url)
     with NamedTemporaryFile(delete=False, mode='wb+') as file__:
         for chunk in resp.iter_content(CHUNK_SIZE):
             file__.write(chunk)
@@ -184,17 +201,22 @@ def annotate_url(service_name, url, params):
     """
     logger = logging.getLogger(__name__)
     logger.info("Running tests for %s".format(service_name))
-    logger.info("SG address is %s", LB_URL)
+    logger.info("ServiceGateway address is %s", LB_URL)
 
-    logger.info("Getting token")
-    signature_key = APP.config['SECURITY']['JWT']['JWT_SIGNATURE_KEY']
-    audience = APP.config['SECURITY']['JWT']['JWT_AUDIENCE']
-    algorithm = APP.config['SECURITY']['JWT']['JWT_ALGORITHM']
-    token = generate_token(signature_key, audience, algorithm, duration=600)
+    if not APP.config['SECURITY'].get('BYPASS_SECURITY', False):
+        logger.info("Getting token")
+        signature_key = APP.config['SECURITY']['JWT']['JWT_SIGNATURE_KEY']
+        audience = APP.config['SECURITY']['JWT']['JWT_AUDIENCE']
+        algorithm = APP.config['SECURITY']['JWT']['JWT_ALGORITHM']
+        token = generate_token(signature_key, audience, algorithm,
+                               duration=600)
+
+        header = {"content-type": 'application/json',
+                  "Authorization": token}
+    else:
+        header = {"content-type": 'application/json'}
 
     params['doc_url'] = url
-    header = {"content-type": 'application/json',
-              "Authorization": token}
     resp = post("{u}/{s}/annotate".format(u=LB_URL, s=service_name),
                 headers=header,
                 params=params)
@@ -213,7 +235,7 @@ def annotate_service(service_name, storage_doc_id, params):
     """
     logger = logging.getLogger(__name__)
     logger.info("Running tests for %s", service_name)
-    logger.info("SG address is %s", LB_URL)
+    logger.info("ServiceGateway address is %s", LB_URL)
     logger.info("Getting token")
     logger.debug("Params are : %s", params)
 
@@ -247,13 +269,18 @@ def transcode(doc_uuid):
     logger = logging.getLogger(__name__)
     logger.info("Launching transcoding request")
 
-    signature_key = APP.config['SECURITY']['JWT']['JWT_SIGNATURE_KEY']
-    audience = APP.config['SECURITY']['JWT']['JWT_AUDIENCE']
-    algorithm = APP.config['SECURITY']['JWT']['JWT_ALGORITHM']
-    token = generate_token(signature_key, audience, algorithm, duration=600)
+    if not APP.config['SECURITY'].get('BYPASS_SECURITY', False):
+        logger.info("Getting token")
+        signature_key = APP.config['SECURITY']['JWT']['JWT_SIGNATURE_KEY']
+        audience = APP.config['SECURITY']['JWT']['JWT_AUDIENCE']
+        algorithm = APP.config['SECURITY']['JWT']['JWT_ALGORITHM']
+        token = generate_token(signature_key, audience, algorithm,
+                               duration=600)
 
-    header = {"content-type": 'application/json',
-              "Authorization": token}
+        header = {"content-type": 'application/json',
+                  "Authorization": token}
+    else:
+        header = {"content-type": 'application/json'}
 
     resp = post("{u}/transcode/{d}".
                 format(u=MSS_URL,

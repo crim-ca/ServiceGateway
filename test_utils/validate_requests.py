@@ -9,9 +9,11 @@ AsyncResult object creation for a given task id.
 import multiprocessing
 import logging
 
-from VestaLoadBalancer.VestaRestPackage.Service.request_process_mesg import send_task_request
-from VestaLoadBalancer.VestaRestPackage.Service.request_process_mesg import get_request_info
-from VestaLoadBalancer.VestaRestPackage.celery_config import APP
+from ServiceGateway.VestaRestPackage.Service.request_process_mesg import\
+    send_task_request
+from ServiceGateway.VestaRestPackage.Service.request_process_mesg import\
+    get_request_info
+from ServiceGateway.VestaRestPackage.celery_config import APP
 
 POOLWIDTH = 80
 POOL = multiprocessing.Pool(POOLWIDTH)

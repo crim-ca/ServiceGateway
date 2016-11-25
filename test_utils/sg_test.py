@@ -2,9 +2,9 @@
 # coding: utf-8
 
 """
-Manual integration test utility for SG.
+Manual integration test utility for ServiceGateway.
 
-Sends process request to SG.
+Sends process request to ServiceGateway.
 """
 
 from time import sleep
