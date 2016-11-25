@@ -50,7 +50,7 @@ clean:
 	rm -rf $(BUILDDIR)/*
 
 install:
-	rsync -av --progress _build/html/ ~/public_html/LoadBalDocs
+	./sync.py
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

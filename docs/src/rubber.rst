@@ -1,5 +1,5 @@
 Elasticity provider
 ===================
 
-.. automodule:: VestaLoadBalancer.rubber
+.. automodule:: ServiceGateway.rubber
    :members:

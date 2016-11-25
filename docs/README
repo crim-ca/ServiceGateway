@@ -7,3 +7,13 @@ activate script such as:
 Then, from this directory, issue the command:
 
    make html
+
+Also you can use the sync program to send the rendered documentation at it's
+standard location such as : 
+
+    ./sync.py
+
+Otherwise you can use the install directive with make wich will invoke the
+latter : 
+
+   make install

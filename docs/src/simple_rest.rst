@@ -1,7 +1,7 @@
 REST front-end
 ==============
 
-.. automodule:: VestaLoadBalancer.simple_rest
+.. automodule:: ServiceGateway.simple_rest
    :members: 
 
 .. todolist::

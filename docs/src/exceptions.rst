@@ -1,5 +1,5 @@
 LoadBalancer exceptions
 =======================
 
-.. automodule:: VestaLoadBalancer.exceptions
+.. automodule:: ServiceGateway.exceptions
    :members:

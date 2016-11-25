@@ -28,7 +28,7 @@ PROJECT_ROOT = os.path.dirname(os.getcwd())
 # version is used.
 sys.path.insert(0, PROJECT_ROOT)
 
-from VestaLoadBalancer.__meta__ import __version__
+from ServiceGateway.__meta__ import __version__
 
 # -- General configuration ------------------------------------------------
 
@@ -42,6 +42,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -59,7 +60,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'LoadBalancer'
+project = u'Service Gateway'
 copyright = u'2014, CRIM'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -114,7 +115,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'nature'
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -192,7 +193,7 @@ html_static_path = ['_static']
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'LoadBalancerdoc'
+htmlhelp_basename = 'Service Gateway documentation'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -212,7 +213,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'LoadBalancer.tex', u'LoadBalancer Documentation',
+    ('index', 'ServiceGateway.tex', u'Service Gateway Documentation',
      u'CRIM', 'manual'),
 ]
 
@@ -242,7 +243,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'loadbalancer', u'LoadBalancer Documentation',
+    ('index', 'Service Gateway', u'Service Gateway Documentation',
      [u'CRIM'], 1)
 ]
 
@@ -256,8 +257,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'LoadBalancer', u'LoadBalancer Documentation',
-     u'CRIM', 'LoadBalancer', 'One line description of project.',
+    ('index', 'Service Gateway', u'Service Gateway Documentation',
+     u'CRIM', 'Service Gateway', 'A HTTP REST interface for asynchronous processing.',
      'Miscellaneous'),
 ]
 
@@ -272,3 +273,14 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/2', None),
+    'celery':
+    ('http://docs.celeryproject.org/en/latest/',
+     None),
+    'mss': ('http://services.vesta.crim.ca/docs/mss/latest/',
+            ('../../MSS/docs/_build/html/objects.inv', None)),
+    'flask': ('http://flask.pocoo.org/docs/0.10/', None),
+    'jass': ('http://services.vesta.crim.ca/docs/jass/latest/',
+             ('../../JASS/docs/_build/html/objects.inv', None))}
