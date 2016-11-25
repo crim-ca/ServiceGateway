@@ -17,20 +17,20 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     HISTORY = history_file.read().replace('.. :changelog:', '')
 
-from VestaLoadBalancer.__meta__ import __version__, __author__, __contact__
+from ServiceGateway.__meta__ import __version__, __author__, __contact__
 
 REQUIREMENTS = ["Flask==0.10.1",
-                "Sphinx==1.2.2",
-                "Werkzeug==0.9.4",
-                "celery==3.1.15",
-                "requests==2.6",
+                "Sphinx==1.3.1",
+                "celery==3.1.19",
+                "requests==2.8.1",
                 "pyrabbit==1.0.1",
                 "PyJWT==0.4.3",
+                "dicttoxml==1.6.6",
                 "python-novaclient==2.23.0"]
 
 setup(
     # -- Meta information --------------------------------------------------
-    name='VestaLoadBalancer',
+    name='ServiceGateway',
     version=__version__,
     description=DESC,
     long_description=README + '\n\n' + HISTORY,
@@ -48,25 +48,24 @@ setup(
     ],
 
     # -- Package structure -------------------------------------------------
-    packages=['VestaLoadBalancer',
-              'VestaLoadBalancer.VestaRestPackage',
-              'VestaLoadBalancer.VestaRestPackage.Service'],
+    packages=['ServiceGateway',
+              'ServiceGateway.VestaRestPackage'],
 
     install_requires=REQUIREMENTS,
     zip_safe=False,
 
-    exclude_package_data={'VestaLoadBalancer': ['.hg', '.hglf']},
+    exclude_package_data={'ServiceGateway': ['.hg', '.hglf']},
 
     package_data={
-        'VestaLoadBalancer': ['static/*', 'templates/service/*'],
-        'VestaLoadBalancer.VestaRestPackage':
+        'ServiceGateway': ['static/*', 'templates/service/*'],
+        'ServiceGateway.VestaRestPackage':
             ['static/*', 'templates/*', 'test_data/*'],
         },
 
     entry_points={
         'console_scripts':
             ['vlb_default_config='
-             'VestaLoadBalancer.VestaRestPackage.'
+             'ServiceGateway.VestaRestPackage.'
              'print_example_configuration:main',
-             'rubber=VestaLoadBalancer.rubber:main']}
+             'rubber=ServiceGateway.rubber:main']}
     )

@@ -1,7 +1,13 @@
-NEP-143-2 SG (Service Gateway)
-==============================
+.. _readme:
 
-This package offers a simple load balancer residing behind a REST API. 
+NEP-143-2 Service Gateway
+=========================
+
+This package offers a HTTP REST API to a distributed service queue Service
+Gateway (SG). 
+
+Overview
+--------
 
 It's intended use is for the exploitation of services on the CANARIE network
 whose services are CPU intensive and which would benefit from a dynamic
@@ -28,47 +34,30 @@ The different functions offered by this code base are the following:
 
 * Provides methods to evaluate infrastructure needs.
 
+The documentation for this project can be found `here
+<http://services.vesta.crim.ca/docs/sg/latest/>`_ .
+
+Infrastructure Overview
+-----------------------
+
 This solution relies on the `Celery
 <http://celery.readthedocs.org/en/latest/index.html>`_ distributed task queue
 and `RabbitMQ <http://www.rabbitmq.com/>`_ messaging broker to dispatch
 processing requests. Also, the REST interface uses the `Flask
 <http://flask.pocoo.org/>`_ WEB framework.
 
-License
--------
+Basic Usage
+-----------
 
-See:
-https://github.com/crim-ca/ServiceGateway/tree/master/THIRD_PARTY_LICENSES.rst
+Interface instantiation
++++++++++++++++++++++++
 
-Installation
-------------
+.. note:: Before starting the application, one must apply his own configuration
+          values, see :ref:`configuration` section.
 
-You can use the `pip
-<https://pip.readthedocs.org/en/latest/reference/pip_install.html>`_ utility to
-install this package. One way of doing that is by pointing pip directly to the
-directory containing the setup.py file such as::
+For validation purposes, usage is as follows:
 
-   pip install .
-
-Alternatively, one can use the public repository of this project for
-installation by pip such as::
-
-    pip install git@github.com:crim-ca/ServiceGateway.git
-
-This will install the VestaLoadBalancer along with program entry points for
-various utilities.
-
-A good practise might be to make use of a `virtual environment
-<https://virtualenv.pypa.io/en/latest/>`_ in which all the
-dependencies will be installed through pip. 
-
-Tests were conducted on Python 2.6.x and should normally worker under version
-2.7 (untested).
-
-Usage
------
-
-For validation purposes, usage is as follows::
+.. code-block:: bash
 
    python run_local.py --help
 
@@ -79,31 +68,49 @@ documentation for more information.
 
 .. Warning::
 
-   The REST interface in run_local / debug mode uses a built-in Web Server. While
-   this Web Server is useful for a closed environment, it is not recommended as a
-   Web Server for a production environment. Care should be taken to configure a
-   `WSGI <http://wsgi.readthedocs.org/en/latest/index.html>`_ gateway to a
+   The REST interface in run_local / debug mode uses a built-in Web Server.
+   While this Web Server is useful for a closed environment, it is not
+   recommended as a Web Server for a production environment. Care should be
+   taken to configure a `WSGI
+   <http://wsgi.readthedocs.org/en/latest/index.html>`_ gateway to a
    production-ready WebServer such as `Apache <http://httpd.apache.org/>`_ or
    `GUnicorn <http://gunicorn.org/>`_ behind a reverse-proxy server such as
    NGinx.
 
 
-Command line usage
-++++++++++++++++++
+Command line client calls
++++++++++++++++++++++++++
 
-In a new terminal window, issue the following command::
+.. TODO:: Fold back this information in the Users's guide or at least merge the
+          two.
 
-   curl http://localhost:5000/annotator/annotate --data-urlencode doc_url=http://some.url.wav --data-urlencode ann_doc_id=<ann_doc_id> --header "Authorization: <JWT key>"
+A practical way to interact with the REST API is to use the `curl
+<http://curl.haxx.se/>`_ command.
+
+In a new terminal window, issue the following command:
+
+.. code-block:: bash
+
+   curl http://localhost:5000/annotator/annotate\
+     --data-urlencode doc_url=http://some.url.wav\
+     --data-urlencode ann_doc_id=<ann_doc_id>\
+     --header "Authorization: <JWT key>"
 
 Where <JWT key> is a JWT encoded key. For testing purposes a helper script can
-be invoked with the following command to generate a valid JWT::
+be invoked with the following command to generate a valid JWT:
 
-    python -m VestaRestPackage.jwt_
+.. code-block:: bash
 
-Or if the MSS is configured properly in install_config.ini you can use a valid
-storage_doc_id for document uploaded to this MSS as follows::
+   python -m VestaRestPackage.jwt_
 
-   curl http://localhost:5000/annotator/annotate/<storage_doc_id> --data-urlencode ann_doc_id=<ann_doc_id> --header "Authorization: <JWT key>"
+Or if a :ref:`Multimedia Storage System (MSS)<mss:mss_intro>` is configured
+properly in install_config.ini you can use a valid storage_doc_id for document
+uploaded to this MSS as follows:
+
+.. code-block:: bash
+
+   curl http://localhost:5000/annotator/annotate/<storage_doc_id>\
+       --data-urlencode ann_doc_id=<ann_doc_id> --header "Authorization: <JWT key>"
 
 
 Where «annotator» would be the name of a given service and «some.url.wav»
@@ -112,30 +119,34 @@ and a task request should have been sent on the worker queue where a service
 worker could have consumed the request and launched the processing. 
 
 When complete, the annotations will be available through the *status* route.
-The *status* route can be invoked as follows::
+The *status* route can be invoked as follows:
+
+.. code-block:: bash
 
    curl http://localhost:5000/annotator/status\?uuid=<UUID>
 
-See documentation for more details.
-
 When invoking the *annotate* route, if the optional ann_doc_id argument is
-supplied, the worker will post the annotations on an annotation storage service
-for the given annotation document UUID. If an error occurred when trying to
-store the annotations, the worker task would have failed and the annotation
-process result would be lost.
+supplied, the worker will post the annotations on an :ref:`annotation storage
+service <jass:jass_home>` for the given annotation document UUID. If an error
+occurred when trying to store the annotations, the worker task would have
+failed and the annotation process result would be lost.
 
 Furthermore, Celery provides a monitor which can be viewed through a WEB
 interface and which also provides a REST API which can be used to monitor and
 control tasks. This monitor is named Celery Flower. The use of Flower is
 entirely optional at this point but might be included in the run-time
-requirements further on. Flower can be started in the following manner::
+requirements further on. Flower can be started in the following manner:
 
-   celery flower --config=<config> --broker_api=http://<broker_url>:<broker_port>/api/
+.. code-block:: bash
+
+   celery flower --config=<config>\
+     --broker_api=http://<broker_url>:<broker_port>/api/
 
 Where <broker_url> and <broker_port> should be set to point to the AMQP broker.
 <config> is the base name of a Python module providing configuration options to
-access the broker. Example contents might be the following::
+access the broker. Example contents might be the following:
 
+.. code-block:: python
    
    BROKER_URL = 'amqp://localhost//'
    CELERY_RESULT_BACKEND = 'amqp://'
@@ -146,3 +157,10 @@ access the broker. Example contents might be the following::
 Of course <localhost> should be configured to point to the actual broker being
 used, which may or may not be the same as the one providing the broker API
 specified on the command line above.
+
+See section :ref:`celery_config_wrapper` for a helper module if you want to
+reuse configuration values for Flower from values extracted from the
+application configuration.
+
+Further information on the REST API can be obtained in the documentation's User
+Guide.
