@@ -45,7 +45,7 @@ from .exceptions import (InsufficientResources,
 from .cloudmanager.openstackcloud import OpenStackCloud
 from .cloudmanager.openstackcloud import VMNotFound
 from .cloudmanager.tools import norm_vm_name
-from .VestaRestPackage.app_objects import APP, CELERY_APP
+from VestaRestPackage.app_objects import APP, CELERY_APP
 
 # For provisionning : The prefered approach seems to be Ansible with
 # appropriate playbooks. Although we may want to tie-in provisionning with

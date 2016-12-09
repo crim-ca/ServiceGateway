@@ -27,12 +27,12 @@ from dicttoxml import dicttoxml
 import jinja2
 
 # -- Project specific --------------------------------------------------------
-from .VestaRestPackage.request_authorisation import validate_authorisation
-from .VestaRestPackage.utility_rest import (request_wants_xml,
-                                            get_request_url,
-                                            submit_task,
-                                            uuid_task)
-from .VestaRestPackage.generic_rest_api import APP
+from VestaRestPackage.request_authorisation import validate_authorisation
+from VestaRestPackage.utility_rest import (request_wants_xml,
+                                           get_request_url,
+                                           submit_task,
+                                           uuid_task)
+from VestaRestPackage.generic_rest_api import APP
 from . import __meta__  # Not really used here but __meta__ needs to be updated
 
 # Add the SG templates folder to the template loader directories

@@ -1,3 +1,0 @@
-[submodule "VestaLoadBalancer/RESTPackage"]
-	path = VestaLoadBalancer/VestaRestPackage
-	url = https://github.com/crim-ca/RESTPackage
