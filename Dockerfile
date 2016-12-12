@@ -1,4 +1,5 @@
 FROM centos:6.6
+# TODO : Try alpine for smaller image ...
 
 # Install required libraries -------------------------------
 RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
@@ -24,20 +25,15 @@ RUN cd /tmp/install/netifaces/netifaces-0.10.4 &&\
     python setup.py install
 
 # Install external dependencies -------------------
-RUN pip install python-swiftclient \ 
+RUN pip install python-swiftclient \
                 python-keystoneclient \
                 gunicorn
 
 # Application -------------------------------------
+COPY . /var/local/src/ServiceGateway
 
-RUN pip install git@github.com:crim-ca/ServiceGateway.git
-
-ENV VRP_CONFIGURATION /opt/vlb/config.py
-
-RUN mkdir -p /opt/vlb
+RUN pip install /var/local/src/ServiceGateway
 
 EXPOSE 5000
-
-WORKDIR /opt/vlb
 
 CMD gunicorn -w 4 -preload -b 0.0.0.0:5000 ServiceGateway.rest_api:APP --log-config=logging.conf
