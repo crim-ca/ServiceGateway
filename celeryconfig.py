@@ -1,1 +1,1 @@
-from ServiceGateway.VestaRestPackage.celery_conf_values import *
+from VestaRestPackage.celery_conf_values import *
