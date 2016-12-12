@@ -36,4 +36,6 @@ RUN pip install /var/local/src/ServiceGateway
 
 EXPOSE 5000
 
-CMD gunicorn -w 4 -preload -b 0.0.0.0:5000 ServiceGateway.rest_api:APP --log-config=logging.conf
+# TODO : Fix tests, run tests here...
+
+CMD gunicorn -w 4 -preload -b 0.0.0.0:5000 ServiceGateway.rest_api:APP --log-config=/var/local/src/ServiceGateway/ServiceGateway/logging.ini
