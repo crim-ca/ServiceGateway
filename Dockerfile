@@ -27,7 +27,8 @@ RUN cd /tmp/install/netifaces/netifaces-0.10.4 &&\
 # Install external dependencies -------------------
 RUN pip install python-swiftclient \
                 python-keystoneclient \
-                gunicorn
+                gunicorn \
+                nose
 
 # Application -------------------------------------
 COPY . /var/local/src/ServiceGateway
@@ -36,6 +37,6 @@ RUN pip install /var/local/src/ServiceGateway
 
 EXPOSE 5000
 
-# TODO : Fix tests, run tests here...
+RUN nosetests -v ServiceGateway
 
 CMD gunicorn -w 4 -preload -b 0.0.0.0:5000 ServiceGateway.rest_api:APP --log-config=/var/local/src/ServiceGateway/ServiceGateway/logging.ini
