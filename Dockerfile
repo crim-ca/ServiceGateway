@@ -4,7 +4,6 @@ FROM centos:6.6
 # Install required libraries -------------------------------
 RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 RUN yum install -y \
-    hg \
     python2-devel \
     gcc \
     python-pip \
