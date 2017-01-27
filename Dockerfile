@@ -5,6 +5,7 @@ RUN yum install -y \
     python2-devel \
     gcc \
     wget \
+    git \
     tar
 
 RUN wget https://bootstrap.pypa.io/get-pip.py && \
@@ -19,7 +20,9 @@ RUN pip install python-swiftclient \
 # Application -------------------------------------
 COPY . /var/local/src/ServiceGateway
 
-RUN pip install /var/local/src/ServiceGateway
+RUN pip install \
+        git+https://github.com/crim-ca/RESTPackage.git@worker_natural_naming \
+        /var/local/src/ServiceGateway
 
 EXPOSE 5000
 
