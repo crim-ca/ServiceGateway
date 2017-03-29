@@ -7,7 +7,7 @@ History
 1.7.6
 -----
 
-* Bugfix: Can use a task name a number of times on different queues.
+* Can use a task name a number of times on different queues.
 
 1.7.3
 -----
