@@ -45,6 +45,19 @@ TEMPLATES_LOADER = jinja2.ChoiceLoader([
 APP.jinja_loader = TEMPLATES_LOADER
 
 
+@APP.route("/<service_route>/submit_json", methods=['POST'])
+def submit_json(service_route):
+    """
+    POST a JSON structure to the service Gateway which will be passed on to the
+    service.
+    """
+    logger = logging.getLogger(__name__)
+    logger.info("JSON structure submitted at %s", service_route)
+    json_struct = request.get_json()
+    logger.debug("JSON contents : %s", json_struct)
+    return 'OK'
+
+
 @APP.route("/<service_route>/process", methods=['POST'])
 @APP.route("/<service_route>/process/<storage_doc_id>",
            methods=['POST'])
