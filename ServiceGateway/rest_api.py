@@ -55,7 +55,13 @@ def submit_json(service_route):
     logger.info("JSON structure submitted at %s", service_route)
     json_struct = request.get_json()
     logger.debug("JSON contents : %s", json_struct)
-    return 'OK'
+    # TODO: Send structure to Celery.
+    storage_doc_id = json_struct['storage_doc_id']
+    ann_srv_url = json_struct['ann_srv_url']
+
+    result = submit_task(storage_doc_id, 'annotate', service_route,
+                         ann_srv_url=ann_srv_url)
+    return result
 
 
 @APP.route("/<service_route>/process", methods=['POST'])
