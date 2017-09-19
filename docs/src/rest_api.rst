@@ -1,7 +1,7 @@
 REST front-end
 ==============
 
-.. automodule:: ServiceGateway.simple_rest
+.. automodule:: ServiceGateway.rest_api
    :members: 
 
 .. todolist::
