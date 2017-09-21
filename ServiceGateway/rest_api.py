@@ -68,8 +68,12 @@ def process(service_route, storage_doc_id=None):
     validate_authorisation(request, APP.config["SECURITY"])
 
     logger.info("JSON structure submitted at %s", service_route)
-    json_struct = request.get_json()
-    logger.debug("JSON contents : %s", json_struct)
+    json_struct = request.get_json(silent=True)
+    if json_struct is None:
+        logger.info("No JSON structure supplied")
+        json_struct = {}
+    else:
+        logger.info("JSON contents : %s", json_struct)
 
     if 'ann_doc_id' in request.values:
         ann_doc_id = request.values['ann_doc_id']
@@ -79,11 +83,18 @@ def process(service_route, storage_doc_id=None):
     else:
         ann_srv_url = None
 
+    flag_noparams = False
+    if 'noparams' in APP.config['WORKER_SERVICES'][service_route]:
+        flag_noparams = \
+            APP.config['WORKER_SERVICES'][service_route]['noparams']
+        logger.debug("noparams = {}", flag_noparams)
+
     result = submit_task(storage_doc_id,
                          'annotate',
                          service_route,
                          ann_srv_url=ann_srv_url,
-                         misc=json_struct)
+                         misc=json_struct,
+                         no_params_needed=flag_noparams)
     return result
 
 
