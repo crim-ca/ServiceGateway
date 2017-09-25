@@ -71,3 +71,17 @@ class NoProfilesFoundError(RubberException):
     elasticity might be applied.
     """
     pass
+
+
+class SGException(Exception):
+    """
+    Base exception class for ServiceGateway
+    """
+    pass
+
+
+class MissingParameterError(SGException):
+    """
+    Missing parameter when calling ServiceGateway.
+    """
+    pass
