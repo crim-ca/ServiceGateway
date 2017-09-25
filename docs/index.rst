@@ -51,6 +51,7 @@ Package information
    :maxdepth: 2
 
    install
+   configuration
    authors
    license
    provenance
