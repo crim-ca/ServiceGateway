@@ -283,4 +283,6 @@ intersphinx_mapping = {
             ('../../MSS/docs/_build/html/objects.inv', None)),
     'flask': ('http://flask.pocoo.org/docs/0.10/', None),
     'jass': ('http://services.vesta.crim.ca/docs/jass/latest/',
-             ('../../JASS/docs/_build/html/objects.inv', None))}
+             ('../../JASS/docs/_build/html/objects.inv', None)),
+    'vrp': ('http://services.vesta.crim.ca/docs/vrp/latest/',
+            ('../../VestaRestPackage/docs/_build/html/objects.inv', None))}
