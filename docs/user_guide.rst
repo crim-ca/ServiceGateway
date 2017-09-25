@@ -1,4 +1,4 @@
-.. _common_rest_interface:
+... _common_rest_interface:
 
 Service Gateway interface documentation
 =======================================
@@ -7,29 +7,23 @@ Service Gateway interface documentation
 Purpose
 -------
 
-The Service Gateway is essentially a Gateway from an HTTP REST interface to
-Celery/AMQP interface.
+The Service Gateway is essentially a Gateway from an HTTP REST interface to Celery/AMQP interface.
 
-This document describes the WEB service interfaces that are common for each
-service which can be exposed by the current Service Gateway.
+This document describes the WEB service interfaces that are common for each service which can be exposed by the current Service Gateway.
 
-It shows how a service can be used, the standard response types
-and how to handle exceptions.
+It shows how a service can be used, the standard response types and how to handle exceptions.
 
 
 .. overview ---------------------------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_overview.rst
+.. include:: ../../VestaRestPackage/docs/ug_overview.inc
 
 
 Methods
 -------
 
-Most methods are supplied my an underlying package which offers base methods to
-control Service workers, including the basic routes required by the CANARIE
-Service API.
+Most methods are supplied my an underlying package which offers base methods to control Service workers, including the basic routes required by the CANARIE Service API.
 
-The Service Gateway builds on top of these methods and offers more
-specific functionalities.
+The Service Gateway builds on top of these methods and offers more specific functionalities.
 
 
 .. _lb_methods:
@@ -37,9 +31,7 @@ specific functionalities.
 Service Gateway methods set
 +++++++++++++++++++++++++++
 
-The Service Gateway REST interface is used to launch and monitor an annotation
-processing request for a given document using any of the supported annotator
-services.
+The Service Gateway REST interface is used to launch and monitor an annotation processing request for a given document using any of the supported annotator services.
 
 It covers:
 
@@ -51,8 +43,7 @@ Where <Base URI> will look like <Server>/<annotator_name>. e.g.::
 
    http://vesta.crim.ca/diarisation
 
-The specific service documentation should be checked to have an overview of
-supported services.
+The specific service documentation should be checked to have an overview of supported services.
 
 
 .. _annotate_method:
@@ -60,9 +51,7 @@ supported services.
 annotate
 ~~~~~~~~
 
-Launch the processing for a given document. Optionally store resulting
-annotations on a remote :ref:`Annotations Storage Service <jass:jass_home>`
-when supplying annotation document UUID.
+Launch the processing for a given document. Optionally store resulting annotations on a remote :ref:`Annotations Storage Service <jass:jass_home>` when supplying annotation document UUID.
 
 This method uses HTTP POST.
 
@@ -78,17 +67,11 @@ Parameters:
    Annotations Storage Service but will log a Warning message with information
    regarding this fact.
 
-Any additional parameters which are passed at request time that do not
-correspond to the parameter names above are forwarded to the annotation worker
-through a data structure with the "misc" key. The key value pair names are
-kept. This enables a developer to use arbitrary argument names in the HTTP
-request that will be forwarded to a given service through the JSON data
-structure communicated across AMQP/Celery.
+Any additional parameters which are passed at request time that do not correspond to the parameter names above are forwarded to the annotation worker through a data structure with the "misc" key. The key value pair names are kept. This enables a developer to use arbitrary argument names in the HTTP request that will be forwarded to a given service through the JSON data structure communicated across AMQP/Celery.
 
 Return value:
 
-The service returns a JSON structure containing an «uuid» identifying the
-processing request:
+The service returns a JSON structure containing an «uuid» identifying the processing request:
 
 .. code-block:: json
 
@@ -96,8 +79,7 @@ processing request:
        "uuid": "6547137e-cc2f-4008-b1eb-4ae8e898ce83"
    }
 
-The resulting «uuid» can then be used to perform further status queries to the
-service.
+The resulting «uuid» can then be used to perform further status queries to the service.
 
 .. note:: If there is a need to use an Annotations Storage Service as a back-end
           the configuration of the LoadBalancer must specify the Annotations
@@ -150,8 +132,7 @@ Parameters:
 
 Return value:
 
-Returns a given response depending on the processing state. Consult the
-:ref:`status_method` page for the documentation of the response format.
+Returns a given response depending on the processing state. Consult the :ref:`status_method` page for the documentation of the response format.
 
 
 Examples:
@@ -165,40 +146,43 @@ URL form:
 
 
 .. cancel method -------------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_cancel_method.rst
+.. include:: ../../VestaRestPackage/docs/ug_cancel_method.inc
 
 
 .. Info route ----------------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_info_route.rst
+.. include:: ../../VestaRestPackage/docs/ug_info_route.inc
 
 
 .. Status method -------------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_status_method.rst
+.. include:: ../../VestaRestPackage/docs/ug_status_method.inc
 
 
 .. CANARIE API ---------------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_canarie_api.rst
+.. include:: ../../VestaRestPackage/docs/ug_canarie_api.inc
 
+.. Security ------------------------------------------------------
+
+The Service Gateway can use authorization tokens to protect it's routes from unwanted access. This is done with the use of `JWT <https://jwt.io/>`_ according to the deployment :ref:`default_config_values`.
 
 .. Error codes section ===========================================
-.. include:: ../../VestaRestPackage/docs/ug_error_codes_preamble.rst
+.. include:: ../../VestaRestPackage/docs/ug_error_codes_preamble.inc
 
 
 .. Core error codes ----------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_core_error_codes.rst
+.. include:: ../../VestaRestPackage/docs/ug_core_error_codes.inc
 
 
 .. VRP error codes -----------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_vrp_error_codes.rst
+.. include:: ../../VestaRestPackage/docs/ug_vrp_error_codes.inc
 
 
 .. Service error codes -------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_worker_services_error_codes.rst
+.. include:: ../../VestaRestPackage/docs/ug_worker_services_error_codes.inc
 
 
 .. Vision error codes --------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_vision_error_codes.rst
+.. include:: ../../VestaRestPackage/docs/ug_vision_error_codes.inc
 
 
 .. Speech error codes --------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_speech_error_codes.rst
+.. include:: ../../VestaRestPackage/docs/ug_speech_error_codes.inc

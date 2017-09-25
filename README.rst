@@ -158,7 +158,7 @@ Of course <localhost> should be configured to point to the actual broker being
 used, which may or may not be the same as the one providing the broker API
 specified on the command line above.
 
-See section :ref:`celery_config_wrapper` for a helper module if you want to
+See section :any:`celery_config_wrapper` for a helper module if you want to
 reuse configuration values for Flower from values extracted from the
 application configuration.
 
