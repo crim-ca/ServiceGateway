@@ -4,6 +4,13 @@ History
 =======
 
 
+1.7.7
+-----
+
+* Can use a JSON body subitted to the process route.
+* Configuration for a service can contain a no_parameter directive.
+* Fixes to error handling for certain types of exceptions.  
+
 1.7.6
 -----
 
@@ -22,8 +29,7 @@ History
 1.7.0
 -----
 
-* Arbitrary arguments which are unknown are passed onwards to the worker
-    through the "misc" sub-structure in JSON.
+* Arbitrary arguments which are unknown are passed onwards to the worker through the "misc" sub-structure in JSON.
 
 1.6.0
 -----
