@@ -4,7 +4,7 @@ History
 =======
 
 
-1.7.7
+1.8.0
 -----
 
 * Can use a JSON body subitted to the process route.
