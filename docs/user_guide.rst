@@ -117,6 +117,39 @@ Alternatively:
       <Base URI>/annotate --data-urlencode doc_url=http://localhost:8000/short_en.wav
 
 
+process
+~~~~~~~
+
+This method is essentially the same as :ref:`annotate_method` with the following difference: this method accepts a JSON structure containing arbitraty arguments as http POST body contents. The whole structure is passed on to the service in the misc dictionnary.
+
+The URL parameters which are required in the :ref:`annotate_method` are required as well for the process method. Hence one can submit a request in the same manner as for the annotate method yet also supply JSON contents in the body.
+
+For example:
+
+.. code-block:: bash
+
+   curl -X POST --data-urlencode ann_doc_id=541a0ebb1747d5305901b48a\
+      <Base URI>/process --data-urlencode doc_url=http://localhost:8000/short_en.wav\
+      --data-binary "@path/to/file"
+
+In which the file contents would be for example:
+
+.. code-block:: json
+
+   {
+       "task": "VideoOnly",
+       "videoparams": {
+           "codec": "h264",
+           "bitrate": "1000k"
+       },
+       "dest": {
+           "url": "ftp://ftp.server.ca/dest/tmp",
+           "username": "myuser",
+           "password": "my_password"
+       }
+   }
+
+
 status
 ~~~~~~
 
