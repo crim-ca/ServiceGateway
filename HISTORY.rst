@@ -4,6 +4,11 @@ History
 =======
 
 
+1.8.1
+-----
+
+* Fix handling of case where JSON is submitted and no_params_needed = False.
+
 1.8.0
 -----
 
