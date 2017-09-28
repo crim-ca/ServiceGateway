@@ -4,6 +4,11 @@ History
 =======
 
 
+1.8.2
+-----
+
+* Configuration directive no_params_needed is now optionnal.
+
 1.8.1
 -----
 
