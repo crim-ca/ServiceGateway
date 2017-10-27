@@ -113,7 +113,7 @@ class NoResourcesError(Exception):
         # TODO : Evaluate if we need to call super.__init__
 
 
-class ICloud:
+class ICloud(object):
     """
     The ICloud interface is the framework for implementing support for
     a specific IaaS cloud implementation. In general, you'll need to
@@ -144,7 +144,7 @@ class ICloud:
         self.errorconnect = None
         self.priority = priority
         self.failed_image_set = set()
-        self.__dict__ = {}
+        #self.__dict__ = {}
         self.vms_lock = None
         self.res_lock = None
 

@@ -6,6 +6,7 @@ import logging
 
 # -- Third party -------------------------------------------------------------
 import novaclient.v1_1.client as nvclient
+#import novaclient.client as nvclient
 import novaclient.exceptions
 
 # -- Project - specific ------------------------------------------------------
@@ -31,7 +32,17 @@ class OpenStackCloud(cloud_tools.ICloud):
                  placement_zone=None, enabled=True, priority=0):
 
         # Call super class's init
+        '''
         cloud_tools.ICloud.__init__(self, name=name, host=auth_url,
+                                    cloud_type=cloud_type,
+                                    memory=memory, max_vm_mem=max_vm_mem,
+                                    networks=networks,
+                                    vm_slots=vm_slots, cpu_cores=cpu_cores,
+                                    storage=storage, hypervisor=hypervisor,
+                                    boot_timeout=boot_timeout, enabled=enabled,
+                                    priority=priority)
+        '''
+        super(self.__class__ ,self).__init__(name=name, host=auth_url,
                                     cloud_type=cloud_type,
                                     memory=memory, max_vm_mem=max_vm_mem,
                                     networks=networks,
@@ -163,6 +174,8 @@ class OpenStackCloud(cloud_tools.ICloud):
         # here.
         name = vm_name
         instance = None
+
+
 
         if name:
             try:

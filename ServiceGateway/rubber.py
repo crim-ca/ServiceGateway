@@ -36,15 +36,15 @@ import requests
 import pyrabbit   # Wrapper for the RabbitMQ HTTP management API
 
 # -- project - specific ------------------------------------------------------
-from .exceptions import (InsufficientResources,
+from ServiceGateway.exceptions import (InsufficientResources,
                          NoIdleWorkersError,
                          MinimumWorkersReached,
                          NoProfilesFoundError,
                          NoTearDownTargets,
                          IncompatibleBackendError)
-from .cloudmanager.openstackcloud import OpenStackCloud
-from .cloudmanager.openstackcloud import VMNotFound
-from .cloudmanager.tools import norm_vm_name
+from ServiceGateway.cloudmanager.openstackcloud import OpenStackCloud
+from ServiceGateway.cloudmanager.openstackcloud import VMNotFound
+from ServiceGateway.cloudmanager.tools import norm_vm_name
 from VestaRestPackage.app_objects import APP, CELERY_APP
 
 # For provisionning : The prefered approach seems to be Ansible with
@@ -74,7 +74,11 @@ def is_booting(vm_info):
     """
     Evaluate if a VM might still be in it's booting stage
     """
-    uptime = time() - vm_info['time']
+    try:
+        uptime = time() - vm_info['time']
+    except Exception as e:
+        uptime = 0
+
     return uptime < SLACKER_TIME_THRESHOLD
 
 
@@ -173,7 +177,8 @@ class Rubber(object):
         pr_ = self.profiles[profile]  # Shorthand on config structure.
         queue_name = pr_['celery_queue_name']
         max_workers = pr_['max_vms']
-        actual_worker_count = len(pr_['consumers'])
+        #actual_worker_count = len(pr_['consumers'])
+        actual_worker_count = len(self.queues[queue_name]['consumers'])
         if actual_worker_count + 1 > max_workers:
             raise InsufficientResources("Not enough resources to spawn a new"
                                         " virtual machine for {p}".
@@ -182,6 +187,11 @@ class Rubber(object):
         vm_name = norm_vm_name("{p}-{u}".format(p=queue_name[:10], u=uuid4()))
         self.logger.info("Requesting to spawn machine with name {n}".
                          format(n=vm_name))
+
+        # Modify cloud_init_file to set up the right queue for the worker that will be runnning on the new VM
+
+        pr_['os_args']['pre_customization'][0] = pr_['os_args']['pre_customization'][0].format(QUEUE_NAME=queue_name)
+
         self.my_cloud.vm_create(vm_name, **pr_['os_args'])
         sci = {'time': time(), 'queue_name': queue_name}
         self.vm_shelf[vm_name] = sci
@@ -245,14 +255,14 @@ class Rubber(object):
         #        versions.
         all_wrkrs = requests.get('{u}/workers'.format(u=FL_API_URL)).json()
         # Active workers only
-        workers = dict([(k, v) for k, v in all_wrkrs.items() if v['status']])
+        workers = dict([(k, v) for k, v in all_wrkrs.items() if v['stats']])
         self.workers = workers
 
         queue_consumers = defaultdict(list)
         for worker in workers:
             self.logger.debug("Inspecting worker {w}".format(w=worker))
-            for queue_name in workers[worker]['queues']:
-                queue_consumers[queue_name].append(worker)
+            for queue in workers[worker]['active_queues']:
+                queue_consumers[queue['name']].append(worker)
 
         for queue_name in self.queues:
             consumers = queue_consumers[queue_name]
@@ -294,9 +304,16 @@ class Rubber(object):
         :param queue_name: Name of the profile defining a worker class.
         :returns: A list of all idle workers.
         """
+        #idle_workers = [k.split('@')[-1] for k, v in self.workers.items()
+        #                if not v['running_tasks'] and
+        #                queue_name in v['queues']]
+
+
         idle_workers = [k.split('@')[-1] for k, v in self.workers.items()
-                        if not v['running_tasks'] and
-                        queue_name in v['queues']]
+                        if not v['active'] and
+                        queue_name in [qn['name'] for qn in v['active_queues']]]
+
+
         self.logger.debug("Idle workers for {p} are : {i}".
                           format(i=idle_workers, p=queue_name))
         return idle_workers
@@ -334,8 +351,9 @@ class Rubber(object):
             spawn_r = profile_params.get('spawn_ratio', 0.2)
 
             # Check if we have any spawning workers and how many
-            booting = [v for v in self.vm_shelf if is_booting(v) and
+            booting = [v for key, v in self.vm_shelf.items() if is_booting(v) and
                        v['queue_name'] == queue_name]
+
             self.logger.info("Still waiting for {n} machines to boot for {p}".
                              format(n=len(booting), p=profile))
 
