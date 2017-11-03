@@ -108,7 +108,8 @@ class Rubber(object):
         if broker_info.scheme.lower() != 'amqp':
             raise IncompatibleBackendError("Can only work with a AMQP broker")
 
-        broker_addr = broker_info.netloc.split(":")[0]
+        #broker_addr = broker_info.netloc.split(":")[0]
+        broker_addr = broker_info.hostname
         broker_port = APP.config['BROKER_ADMIN_PORT']
         broker_loc = "{l}:{p}".format(l=broker_addr, p=broker_port)
         self.logger.info(u"Using broker address : {a}".format(a=broker_loc))
