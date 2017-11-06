@@ -31,4 +31,4 @@ RUN nosetests -v ServiceGateway
 #CMD ["-w", "4", "-preload", "-b", "0.0.0.0:5000", "--log-config=/var/local/src/ServiceGateway/ServiceGateway/logging.ini"]
 ENV PYTHONPATH /var/local/src/ServiceGateway
 
-CMD ["bash", "/etc/init_queue_start_rubber.sh"]
+CMD ["python", "/var/local/src/ServiceGateway/ServiceGateway/rubber.py"]

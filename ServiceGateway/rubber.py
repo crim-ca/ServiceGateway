@@ -345,6 +345,7 @@ class Rubber(object):
 
         queue_name = self.profiles[profile]['celery_queue_name']
         pending_jobs = self.get_queue_length(queue_name)
+
         idle_workers = self.get_idle_workers(queue_name)
 
         if pending_jobs > BACKORDER_THRESHOLD:
@@ -416,30 +417,33 @@ class Rubber(object):
             self.check_slackers()
 
             for profile in self.profiles:
-                needed_workers = self.evaluate_needs(profile)
-                if needed_workers > 0:
-                    self.logger.info(u'We need to spawn {0} workers'.
-                                     format(needed_workers))
-                    for iteration in range(needed_workers):
-                        try:
-                            self.spawn(profile)
-                        except InsufficientResources as exc:
-                            self.logger.warning(u"Could not spawn new "
-                                                u"resources : {0}".
-                                                format(repr(exc)))
-                elif needed_workers < 0:
-                    surplus = abs(needed_workers) - self.min_wms_per_service
-                    self.logger.info(u'We could release {0} workers'.
-                                     format(surplus))
-                    for iteration in range(surplus):
-                        try:
-                            self.teardown(profile)
-                        except MinimumWorkersReached as exc:
-                            self.logger.info(u'Cannot terminate worker '
-                                             u': {0}'.format(repr(exc)))
-                        except (NoIdleWorkersError, NoTearDownTargets) as exc:
-                            self.logger.warning(u'Cannot terminate worker '
-                                                u': {0}'.format(repr(exc)))
+                try:
+                    needed_workers = self.evaluate_needs(profile)
+                    if needed_workers > 0:
+                        self.logger.info(u'We need to spawn {0} workers'.
+                                         format(needed_workers))
+                        for iteration in range(needed_workers):
+                            try:
+                                self.spawn(profile)
+                            except InsufficientResources as exc:
+                                self.logger.warning(u"Could not spawn new "
+                                                    u"resources : {0}".
+                                                    format(repr(exc)))
+                    elif needed_workers < 0:
+                        surplus = abs(needed_workers) - self.min_wms_per_service
+                        self.logger.info(u'We could release {0} workers'.
+                                         format(surplus))
+                        for iteration in range(surplus):
+                            try:
+                                self.teardown(profile)
+                            except MinimumWorkersReached as exc:
+                                self.logger.info(u'Cannot terminate worker '
+                                                 u': {0}'.format(repr(exc)))
+                            except (NoIdleWorkersError, NoTearDownTargets) as exc:
+                                self.logger.warning(u'Cannot terminate worker '
+                                                    u': {0}'.format(repr(exc)))
+                except Exception as e:
+                    self.logger.info(e.__repr__())
 
 
 def main():
