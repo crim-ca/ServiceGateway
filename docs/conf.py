@@ -277,12 +277,8 @@ texinfo_documents = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/2', None),
     'celery':
-    ('http://docs.celeryproject.org/en/latest/',
-     None),
-    'mss': ('http://services.vesta.crim.ca/docs/mss/latest/',
-            ('../../MSS/docs/_build/html/objects.inv', None)),
+    ('http://docs.celeryproject.org/en/latest/', None),
+    'mss': ('http://vesta.crim.ca/docs/mss/latest/', None),
     'flask': ('http://flask.pocoo.org/docs/0.10/', None),
-    'jass': ('http://services.vesta.crim.ca/docs/jass/latest/',
-             ('../../JASS/docs/_build/html/objects.inv', None)),
-    'vrp': ('http://services.vesta.crim.ca/docs/vrp/latest/',
-            ('../../VestaRestPackage/docs/_build/html/objects.inv', None))}
+    'jass': ('http://vesta.crim.ca/docs/jass/latest/', None),
+    'vrp': ('http://vesta.crim.ca/docs/vrp/latest/', None)}

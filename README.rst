@@ -35,7 +35,7 @@ The different functions offered by this code base are the following:
 * Provides methods to evaluate infrastructure needs.
 
 The documentation for this project can be found `here
-<http://services.vesta.crim.ca/docs/sg/latest/>`_ .
+<http://vesta.crim.ca/docs/sg/latest/>`_ .
 
 Infrastructure Overview
 -----------------------

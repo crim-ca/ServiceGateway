@@ -14,16 +14,16 @@ This document describes the WEB service interfaces that are common for each serv
 It shows how a service can be used, the standard response types and how to handle exceptions.
 
 
-.. overview ---------------------------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_overview.inc
-
-
 Methods
 -------
 
 Most methods are supplied my an underlying package which offers base methods to control Service workers, including the basic routes required by the CANARIE Service API.
 
 The Service Gateway builds on top of these methods and offers more specific functionalities.
+
+See :ref:`Rest interface overview <vrp:user_guide_overview>` for general
+information on the REST interface. All of the functions provided by the common
+REST interface are also available in this element.
 
 
 .. _lb_methods:
@@ -177,45 +177,6 @@ URL form:
    <Base URI>/status?uuid=6547137e-cc2f-4008-b1eb-4ae8e898ce83
 
 
-
-.. cancel method -------------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_cancel_method.inc
-
-
-.. Info route ----------------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_info_route.inc
-
-
-.. Status method -------------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_status_method.inc
-
-
-.. CANARIE API ---------------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_canarie_api.inc
-
 .. Security ------------------------------------------------------
 
 The Service Gateway can use authorization tokens to protect it's routes from unwanted access. This is done with the use of `JWT <https://jwt.io/>`_ according to the deployment :ref:`default_config_values`.
-
-.. Error codes section ===========================================
-.. include:: ../../VestaRestPackage/docs/ug_error_codes_preamble.inc
-
-
-.. Core error codes ----------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_core_error_codes.inc
-
-
-.. VRP error codes -----------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_vrp_error_codes.inc
-
-
-.. Service error codes -------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_worker_services_error_codes.inc
-
-
-.. Vision error codes --------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_vision_error_codes.inc
-
-
-.. Speech error codes --------------------------------------------
-.. include:: ../../VestaRestPackage/docs/ug_speech_error_codes.inc

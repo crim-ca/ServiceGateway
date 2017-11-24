@@ -50,7 +50,7 @@ clean:
 	rm -rf $(BUILDDIR)/*
 
 install:
-	./sync.py
+	./sync.py --destination vesta_docs:/var/www/html/doc/sg/
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
