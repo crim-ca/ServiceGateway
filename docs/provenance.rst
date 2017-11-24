@@ -1,10 +1,10 @@
 Provenance
 ==========
 
-Who authorizes releases: Tom Landry (CRIM, project lead).
+Who authorizes releases: Frederic Osterrath (CRIM, tech lead).
 
 Release validation procedure
 ----------------------------
 
-Processes are tested individually then tested in a staging environment before
-public release.
+Processes are tested individually then tested in an integration environment
+before public release.
