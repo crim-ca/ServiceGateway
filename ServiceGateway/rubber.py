@@ -42,9 +42,14 @@ from ServiceGateway.exceptions import (InsufficientResources,
                          NoProfilesFoundError,
                          NoTearDownTargets,
                          IncompatibleBackendError)
-from ServiceGateway.cloudmanager.openstackcloud import OpenStackCloud
-from ServiceGateway.cloudmanager.openstackcloud import VMNotFound
-from ServiceGateway.cloudmanager.tools import norm_vm_name
+
+
+from ServiceGateway.cloudscheduler.openstackcluster import OpenStackCluster
+from ServiceGateway.cloudscheduler.cluster_tools import norm_vm_name
+
+
+
+
 from VestaRestPackage.app_objects import APP, CELERY_APP
 
 # For provisionning : The prefered approach seems to be Ansible with
@@ -146,7 +151,8 @@ class Rubber(object):
         self.min_wms_per_service = MIN_IDLE_WORKERS
         self.__refresh_worker_knowledge()
 
-        self.my_cloud = OpenStackCloud(**OPS_CONFIG)
+        #self.my_cloud = OpenStackCloud(**OPS_CONFIG)
+        self.my_cloud = OpenStackCluster(**OPS_CONFIG)
 
     def __del__(self):
         """
@@ -190,10 +196,13 @@ class Rubber(object):
                          format(n=vm_name))
 
         # Modify cloud_init_file to set up the right queue for the worker that will be runnning on the new VM
-
-        pr_['os_args']['pre_customization'][0] = pr_['os_args']['pre_customization'][0].format(QUEUE_NAME=queue_name)
+        if 'pre_customization' in pr_['os_args']:
+            if pr_['os_args']['pre_customization']:
+                pr_['os_args']['pre_customization'][0] = pr_['os_args']['pre_customization'][0].format(QUEUE_NAME=queue_name)
 
         self.my_cloud.vm_create(vm_name, **pr_['os_args'])
+
+
         sci = {'time': time(), 'queue_name': queue_name}
         self.vm_shelf[vm_name] = sci
 
@@ -224,7 +233,8 @@ class Rubber(object):
                                         " employment level.".
                                         format(queue_name))
 
-        cloud_workers = set(self.my_cloud.list_vm_names())
+        #cloud_workers = set(self.my_cloud.list_vm_names())
+        cloud_workers = set(self.my_cloud.vms)
         my_workers = set(self.vm_shelf)
         idle_cloud_workers = list(cloud_workers.intersection(idle_workers,
                                                              my_workers))
@@ -238,7 +248,8 @@ class Rubber(object):
         target = idle_cloud_workers.pop()
         self.logger.info(u"Shutting down virtual machine : {0}".
                          format(target))
-        self.my_cloud.vm_delete(target)
+        #self.my_cloud.vm_delete(target)
+        self.my_cloud.vm_destroy(target)
         self.logger.debug(u"Removing {t} from VM object store".
                           format(t=target))
         del self.vm_shelf[target]
@@ -387,8 +398,9 @@ class Rubber(object):
                                      "terminating".format(v=vm_))
                     # Off with his head !!!
                     try:
-                        self.my_cloud.vm_delete(vm_)
-                    except VMNotFound as exc:
+                        #self.my_cloud.vm_delete(vm_)
+                        self.my_cloud.vm_destroy(vm_)
+                    except Exception as exc:
                         self.logger.warning("Could not terminate VM: {e}. "
                                             "Removing from index.".
                                             format(e=str(exc)))
