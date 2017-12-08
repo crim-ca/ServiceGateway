@@ -36,15 +36,20 @@ import requests
 import pyrabbit   # Wrapper for the RabbitMQ HTTP management API
 
 # -- project - specific ------------------------------------------------------
-from .exceptions import (InsufficientResources,
+from ServiceGateway.exceptions import (InsufficientResources,
                          NoIdleWorkersError,
                          MinimumWorkersReached,
                          NoProfilesFoundError,
                          NoTearDownTargets,
                          IncompatibleBackendError)
-from .cloudmanager.openstackcloud import OpenStackCloud
-from .cloudmanager.openstackcloud import VMNotFound
-from .cloudmanager.tools import norm_vm_name
+
+
+from ServiceGateway.cloudscheduler.openstackcluster import OpenStackCluster
+from ServiceGateway.cloudscheduler.cluster_tools import norm_vm_name
+
+
+
+
 from VestaRestPackage.app_objects import APP, CELERY_APP
 
 # For provisionning : The prefered approach seems to be Ansible with
@@ -74,7 +79,11 @@ def is_booting(vm_info):
     """
     Evaluate if a VM might still be in it's booting stage
     """
-    uptime = time() - vm_info['time']
+    try:
+        uptime = time() - vm_info['time']
+    except Exception as e:
+        uptime = 0
+
     return uptime < SLACKER_TIME_THRESHOLD
 
 
@@ -104,7 +113,8 @@ class Rubber(object):
         if broker_info.scheme.lower() != 'amqp':
             raise IncompatibleBackendError("Can only work with a AMQP broker")
 
-        broker_addr = broker_info.netloc.split(":")[0]
+        #broker_addr = broker_info.netloc.split(":")[0]
+        broker_addr = broker_info.hostname
         broker_port = APP.config['BROKER_ADMIN_PORT']
         broker_loc = "{l}:{p}".format(l=broker_addr, p=broker_port)
         self.logger.info(u"Using broker address : {a}".format(a=broker_loc))
@@ -141,7 +151,8 @@ class Rubber(object):
         self.min_wms_per_service = MIN_IDLE_WORKERS
         self.__refresh_worker_knowledge()
 
-        self.my_cloud = OpenStackCloud(**OPS_CONFIG)
+        #self.my_cloud = OpenStackCloud(**OPS_CONFIG)
+        self.my_cloud = OpenStackCluster(**OPS_CONFIG)
 
     def __del__(self):
         """
@@ -173,7 +184,8 @@ class Rubber(object):
         pr_ = self.profiles[profile]  # Shorthand on config structure.
         queue_name = pr_['celery_queue_name']
         max_workers = pr_['max_vms']
-        actual_worker_count = len(pr_['consumers'])
+        #actual_worker_count = len(pr_['consumers'])
+        actual_worker_count = len(self.queues[queue_name]['consumers'])
         if actual_worker_count + 1 > max_workers:
             raise InsufficientResources("Not enough resources to spawn a new"
                                         " virtual machine for {p}".
@@ -182,7 +194,15 @@ class Rubber(object):
         vm_name = norm_vm_name("{p}-{u}".format(p=queue_name[:10], u=uuid4()))
         self.logger.info("Requesting to spawn machine with name {n}".
                          format(n=vm_name))
+
+        # Modify cloud_init_file to set up the right queue for the worker that will be runnning on the new VM
+        if 'pre_customization' in pr_['os_args']:
+            if pr_['os_args']['pre_customization']:
+                pr_['os_args']['pre_customization'][0] = pr_['os_args']['pre_customization'][0].format(QUEUE_NAME=queue_name)
+
         self.my_cloud.vm_create(vm_name, **pr_['os_args'])
+
+
         sci = {'time': time(), 'queue_name': queue_name}
         self.vm_shelf[vm_name] = sci
 
@@ -213,7 +233,8 @@ class Rubber(object):
                                         " employment level.".
                                         format(queue_name))
 
-        cloud_workers = set(self.my_cloud.list_vm_names())
+        #cloud_workers = set(self.my_cloud.list_vm_names())
+        cloud_workers = set(self.my_cloud.vms)
         my_workers = set(self.vm_shelf)
         idle_cloud_workers = list(cloud_workers.intersection(idle_workers,
                                                              my_workers))
@@ -227,7 +248,8 @@ class Rubber(object):
         target = idle_cloud_workers.pop()
         self.logger.info(u"Shutting down virtual machine : {0}".
                          format(target))
-        self.my_cloud.vm_delete(target)
+        #self.my_cloud.vm_delete(target)
+        self.my_cloud.vm_destroy(target)
         self.logger.debug(u"Removing {t} from VM object store".
                           format(t=target))
         del self.vm_shelf[target]
@@ -245,14 +267,14 @@ class Rubber(object):
         #        versions.
         all_wrkrs = requests.get('{u}/workers'.format(u=FL_API_URL)).json()
         # Active workers only
-        workers = dict([(k, v) for k, v in all_wrkrs.items() if v['status']])
+        workers = dict([(k, v) for k, v in all_wrkrs.items() if v['stats']])
         self.workers = workers
 
         queue_consumers = defaultdict(list)
         for worker in workers:
             self.logger.debug("Inspecting worker {w}".format(w=worker))
-            for queue_name in workers[worker]['queues']:
-                queue_consumers[queue_name].append(worker)
+            for queue in workers[worker]['active_queues']:
+                queue_consumers[queue['name']].append(worker)
 
         for queue_name in self.queues:
             consumers = queue_consumers[queue_name]
@@ -294,9 +316,16 @@ class Rubber(object):
         :param queue_name: Name of the profile defining a worker class.
         :returns: A list of all idle workers.
         """
+        #idle_workers = [k.split('@')[-1] for k, v in self.workers.items()
+        #                if not v['running_tasks'] and
+        #                queue_name in v['queues']]
+
+
         idle_workers = [k.split('@')[-1] for k, v in self.workers.items()
-                        if not v['running_tasks'] and
-                        queue_name in v['queues']]
+                        if not v['active'] and
+                        queue_name in [qn['name'] for qn in v['active_queues']]]
+
+
         self.logger.debug("Idle workers for {p} are : {i}".
                           format(i=idle_workers, p=queue_name))
         return idle_workers
@@ -327,6 +356,7 @@ class Rubber(object):
 
         queue_name = self.profiles[profile]['celery_queue_name']
         pending_jobs = self.get_queue_length(queue_name)
+
         idle_workers = self.get_idle_workers(queue_name)
 
         if pending_jobs > BACKORDER_THRESHOLD:
@@ -334,8 +364,9 @@ class Rubber(object):
             spawn_r = profile_params.get('spawn_ratio', 0.2)
 
             # Check if we have any spawning workers and how many
-            booting = [v for v in self.vm_shelf if is_booting(v) and
+            booting = [v for key, v in self.vm_shelf.items() if is_booting(v) and
                        v['queue_name'] == queue_name]
+
             self.logger.info("Still waiting for {n} machines to boot for {p}".
                              format(n=len(booting), p=profile))
 
@@ -367,8 +398,9 @@ class Rubber(object):
                                      "terminating".format(v=vm_))
                     # Off with his head !!!
                     try:
-                        self.my_cloud.vm_delete(vm_)
-                    except VMNotFound as exc:
+                        #self.my_cloud.vm_delete(vm_)
+                        self.my_cloud.vm_destroy(vm_)
+                    except Exception as exc:
                         self.logger.warning("Could not terminate VM: {e}. "
                                             "Removing from index.".
                                             format(e=str(exc)))
@@ -397,30 +429,33 @@ class Rubber(object):
             self.check_slackers()
 
             for profile in self.profiles:
-                needed_workers = self.evaluate_needs(profile)
-                if needed_workers > 0:
-                    self.logger.info(u'We need to spawn {0} workers'.
-                                     format(needed_workers))
-                    for iteration in range(needed_workers):
-                        try:
-                            self.spawn(profile)
-                        except InsufficientResources as exc:
-                            self.logger.warning(u"Could not spawn new "
-                                                u"resources : {0}".
-                                                format(repr(exc)))
-                elif needed_workers < 0:
-                    surplus = abs(needed_workers) - self.min_wms_per_service
-                    self.logger.info(u'We could release {0} workers'.
-                                     format(surplus))
-                    for iteration in range(surplus):
-                        try:
-                            self.teardown(profile)
-                        except MinimumWorkersReached as exc:
-                            self.logger.info(u'Cannot terminate worker '
-                                             u': {0}'.format(repr(exc)))
-                        except (NoIdleWorkersError, NoTearDownTargets) as exc:
-                            self.logger.warning(u'Cannot terminate worker '
-                                                u': {0}'.format(repr(exc)))
+                try:
+                    needed_workers = self.evaluate_needs(profile)
+                    if needed_workers > 0:
+                        self.logger.info(u'We need to spawn {0} workers'.
+                                         format(needed_workers))
+                        for iteration in range(needed_workers):
+                            try:
+                                self.spawn(profile)
+                            except InsufficientResources as exc:
+                                self.logger.warning(u"Could not spawn new "
+                                                    u"resources : {0}".
+                                                    format(repr(exc)))
+                    elif needed_workers < 0:
+                        surplus = abs(needed_workers) - self.min_wms_per_service
+                        self.logger.info(u'We could release {0} workers'.
+                                         format(surplus))
+                        for iteration in range(surplus):
+                            try:
+                                self.teardown(profile)
+                            except MinimumWorkersReached as exc:
+                                self.logger.info(u'Cannot terminate worker '
+                                                 u': {0}'.format(repr(exc)))
+                            except (NoIdleWorkersError, NoTearDownTargets) as exc:
+                                self.logger.warning(u'Cannot terminate worker '
+                                                    u': {0}'.format(repr(exc)))
+                except Exception as e:
+                    self.logger.info(e.__repr__())
 
 
 def main():

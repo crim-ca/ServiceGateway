@@ -14,7 +14,8 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && \
 RUN pip install python-swiftclient \
                 python-keystoneclient \
                 gunicorn \
-                nose
+                nose \
+                pika
 
 # Application -------------------------------------
 COPY . /var/local/src/ServiceGateway
