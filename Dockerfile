@@ -26,9 +26,6 @@ EXPOSE 5000
 
 RUN nosetests -v ServiceGateway
 
-#ENTRYPOINT ["gunicorn", "ServiceGateway.rest_api:APP"]
+ENTRYPOINT ["gunicorn", "ServiceGateway.rest_api:APP"]
 
-#CMD ["-w", "4", "-preload", "-b", "0.0.0.0:5000", "--log-config=/var/local/src/ServiceGateway/ServiceGateway/logging.ini"]
-ENV PYTHONPATH /var/local/src/ServiceGateway
-
-CMD ["python", "/var/local/src/ServiceGateway/ServiceGateway/rubber.py"]
+CMD ["-w", "4", "-preload", "-b", "0.0.0.0:5000", "--log-config=/var/local/src/ServiceGateway/ServiceGateway/logging.ini"]
