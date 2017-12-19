@@ -1,2 +1,2 @@
 python-novaclient==2.23.2
-VestaRestPackage==1.7.8
+VestaRestPackage==1.7.9

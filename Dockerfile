@@ -1,4 +1,7 @@
-FROM centos:centos7
+FROM centos:7
+
+# Ensure appropriates locales are generated
+RUN sed -ie 's/^override_install_langs.*/override_install_langs=fr_CA.utf8,en_CA.utf8/' /etc/yum.conf
 
 # Install required libraries -------------------------------
 RUN yum install -y \
@@ -15,6 +18,10 @@ RUN pip install python-swiftclient \
                 python-keystoneclient \
                 gunicorn \
                 nose
+
+# Set environment encoding for STDOUT ------------
+RUN yum -y -q reinstall glibc-common  # We need to do this to reactivate the locale defs.
+ENV LC_ALL en_CA.utf8
 
 # Application -------------------------------------
 COPY . /var/local/src/ServiceGateway
