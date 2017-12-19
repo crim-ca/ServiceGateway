@@ -4,6 +4,11 @@ History
 =======
 
 
+1.8.3
+-----
+
+* Fix handling of worker exceptions encoded in UTF-8.
+
 1.8.2
 -----
 
