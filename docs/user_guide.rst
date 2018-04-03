@@ -21,15 +21,10 @@ Most methods are supplied my an underlying package which offers base methods to 
 
 The Service Gateway builds on top of these methods and offers more specific functionalities.
 
-See :ref:`Rest interface overview <vrp:user_guide_overview>` for general
-information on the REST interface. All of the functions provided by the common
-REST interface are also available in this element.
+See :ref:`Rest interface overview <vrp:user_guide_overview>` for general information on the REST interface. All of the functions provided by the common REST interface are also available in this element.
 
 
 .. _lb_methods:
-
-Service Gateway methods set
-+++++++++++++++++++++++++++
 
 The Service Gateway REST interface is used to launch and monitor an annotation processing request for a given document using any of the supported annotator services.
 
