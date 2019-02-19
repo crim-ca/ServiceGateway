@@ -1,18 +1,29 @@
 language: python
-python: 2.7
+python:
+  - 2.7
+
 env:
   matrix:
   - TOXENV=py27
   global:
     secure: Ekia2KJJD6x+1mNk5uKGnzKO4Jgh8mQE+ExvKAmkIbpJYugWb7dv+zeO8ldiEk8OuqXB+UAXn1Ls1tMAMujIAmsV2f132PPrYJgcRCVeS89A6buESYEgHMNMQBOllknZwyFYHy4IwpMr0HbAl20s7CG4EXGuP7cmCv0gZT1qT/YSUYD+UjbraatLM74HH/I8CMYQT/3J6ndaSjlxz3NFav/8KwdNgV150toYxZBpNx7WDdQk+yo2Jw8dhAMSC8rhnV3Mf5qFdVX1KdtcVEnH5E8s2tAiDXM21Zp0ZIFcVv6ZeNu7svNXUJdG3VxRBIbrYUBWk2BmF5NAVivjIMc//rOA8X1XneGyC/4SoXVZVOtuvDkGEj1yWhhX8esxlZI0HeZjsrMu3NL0/DHGR5NGmYu/xxiaqNvm+enzQoiyld6SwlZh7PBBstL+UvM20ThB0YddVQbxNyFhLMsxq5mDouqHCrfu3wU/Tlac71HpfClPF5D6VGzwhqg2WNC7dAkIa9qL/+peW1EpalOXoktSn0dwNOuFm3B7RmUHlH9drz3nyXRZFODOXZ51gfUK52yQDqYBLZeGpJ47nFJR1A4dAfs0dREzI6GbbR1jjSxiqEkQnlmR/1yndZG7+7P6xX2k/j+80aefLTl3EF5Mpv2fYdI7WngmUYMn2455JqZ/03A=
+
+cache: pip
+
 install:
 - pip install -U tox
+
 script:
 - tox
+
 notifications:
   slack: crim-ca:A7jqt2VJWnPwN6A3AZXJ40gt
+
 deploy:
   provider: pypi
   distributions: bdist_wheel
   user: crim-ca
-  tags: true
+  password:
+    secure: YoO2N4978Aj63fbhNQwRb9KzvCS30v3nQLS/8CpuhIfB9azj4tynPHlll/8eyDKjlqytqPphzonVpDBjRhD+UnDrTBSdls3Vtz2YgCedcg/ucUpvStgWXhe2gYdUIQ8pOTENu+5/yKS+6eRnTpbdL8wm4J1na1w0kf9PrK0b7tvTX7el3w8GYSoiXc51mjrvZBcLOmKYI7DnybcHwy2WS08e/n42Yywp+qu4U4qoquF2BUP7AxjjrlCCv2m05oapwWhW/lGUG+mFSqwK/bj2PtcJGtfbqGto8dJxk4tWwKNP8KDkt+rATRqPYmNdDdk82BdzaNEeTEvYU5cToOX/6/3uPY66zzKnDGAJfXC8nppo9O2iCVrUqIBFxZMtaXluXNqYmFl58jaY7MD86LToOye4l0AKsclXbAav9t+HuSomCiITQuDxRENT/CxeN7++LybXUSoMiEsMcNuzoxP0MKWQ+EH7iYT75q++g6wI+Vk2QmaP3I9zWuasZUHsJWwv+fNS5nHNaG2LgqtF+APsEeYExXDgz80RZh11Cv++L/vhFZ9tV0QpmefIG/gZ3h0BY2X4Bl9KmGsefv/bgo5XmylR+qPC/Hxd7MlQBo0vbgpJpy5ysD6LRemdwNeWD4fa6pBqCh29LV64J2JfGgWqcEYUKAb8D0X/dQ3SCHC6q/M=
+  on:
+    tags: true
