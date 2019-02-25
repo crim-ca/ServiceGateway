@@ -20,7 +20,7 @@ with open('HISTORY.rst') as history_file:
     HISTORY = history_file.read().replace('.. :changelog:', '')
 
 REQUIREMENTS = ["python-novaclient==2.23.2",
-                "VestaRestPackage==1.7.9"]
+                "VestaRestPackage==1.9.0"]
 
 setup(
     # -- Meta information --------------------------------------------------

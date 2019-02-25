@@ -3,6 +3,10 @@
 History
 =======
 
+1.8.4
+-----
+
+* Updated VestaRestPackage to 1.9.0 with MonboDB support.
 
 1.8.3
 -----
