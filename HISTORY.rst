@@ -3,6 +3,11 @@
 History
 =======
 
+1.8.5
+-----
+
+* Updated VestaRestPackage to 1.9.2
+
 1.8.4
 -----
 
