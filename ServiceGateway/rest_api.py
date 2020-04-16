@@ -59,12 +59,10 @@ APP.jinja_loader = TEMPLATES_LOADER
 # Fixed in recent versions of Flask.
 APP.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
-#
-LOCAL_TEMPORARY_STORAGE = APP.config.get("LOCAL_TEMPORARY_STORAGE", None)
-TEMPORARY_STORAGE_SIZE_LIMIT_GB = LOCAL_TEMPORARY_STORAGE[
-    'size_limit_gb'] if LOCAL_TEMPORARY_STORAGE and 'size_limit_gb' in LOCAL_TEMPORARY_STORAGE else 10
-TEMPORARY_STORAGE_MAX_FILE_DURATION_SECONDS = LOCAL_TEMPORARY_STORAGE[
-    'max_file_duration_seconds'] if LOCAL_TEMPORARY_STORAGE and 'max_file_duration_seconds' in LOCAL_TEMPORARY_STORAGE else 86400
+LOCAL_TEMPORARY_STORAGE = APP.config.get("LOCAL_TEMPORARY_STORAGE", {})
+TEMPORARY_STORAGE_SIZE_LIMIT_GB = LOCAL_TEMPORARY_STORAGE.get('size_limit_gb', 10)
+TEMPORARY_STORAGE_MAX_FILE_DURATION_SECONDS = LOCAL_TEMPORARY_STORAGE.get('max_file_duration_seconds', 86400)
+TMP_DIR = os.path.join(tempfile.gettempdir(), "ServiceGateway")
 
 
 def local_filename_to_url(filename, request):
@@ -121,7 +119,7 @@ def add_file(filename=None):
         stream, form, files = formparser.parse_form_data(request.environ,
                                                          stream_factory=custom_stream_factory)
         if len(files.keys()) != 1:
-            return {"error": "Only one file should be supplied"}, 404
+            return {"error": "Only one file should be supplied"}, 400
         else:
             filepath = files[files.keys()[0]].stream.name
             url = None
@@ -142,12 +140,25 @@ def add_file(filename=None):
 
 def custom_stream_factory(total_content_length, filename, content_type, content_length=None):
     extension = os.path.splitext(secure_filename(filename))[1]
-    tmpfile = tempfile.NamedTemporaryFile('wb+', prefix=str(uuid4()), suffix=extension, delete=False)
+    if not os.path.exists(TMP_DIR):
+        os.makedirs(TMP_DIR)
+    tmpfile = tempfile.NamedTemporaryFile('wb+', prefix=str(uuid4()), suffix=extension, dir=TMP_DIR
+                                          , delete=False)
     return tmpfile
 
 
 @APP.route("/simple_workflow/process", methods=['POST'])
 def process_workflow():
+    """
+    POST a JSON structure to the service Gateway which partial contents will be
+    passed on to the service.
+
+    Requires:
+    * a json field containing the following json { "services": [{service1} ...{serviceN}]} for chaining service execution
+    * a file for each field referenced in the json section.
+    * Temporary files which need to be created inside json field should have this format s__<number/GUID><.optional extension>__e
+    :return:
+    """
     logger = logging.getLogger(__name__)
     service_route = 'simple_workflow'
     service_name = SIMPLE_WORKFLOW
@@ -336,10 +347,9 @@ def get_tmp_files_to_delete():
     Return the temporary files which should be deleted due to either size of time restriction
     :return:    A list of files to delete
     """
-    tmp_dir = "/tmp"
     files = []
-    for f in os.listdir(tmp_dir):
-        filepath = os.path.join(tmp_dir, f)
+    for f in os.listdir(TMP_DIR):
+        filepath = os.path.join(TMP_DIR, f)
         if os.path.isfile(filepath):
             files.append((filepath, os.path.getsize(filepath), os.path.getctime(filepath)))
 

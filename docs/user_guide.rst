@@ -34,7 +34,7 @@ It covers:
 * <Base URI>/process
 * <Base URI>/status
 * <Base URI>/cancel
-* /service_workflow/process_stateless
+* /service_workflow/process
 
 Where <Base URI> will look like <Server>/<annotator_name>. e.g.::
 
@@ -179,7 +179,7 @@ URL form:
 The Service Gateway can use authorization tokens to protect it's routes from unwanted access. This is done with the use of `JWT <https://jwt.io/>`_ according to the deployment :ref:`default_config_values`.
 
 service_workflow/process
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 This method allows to make a single call containing all the information required to use multiple services at once.
 All files and parameters are supplied at call. All the files supplied are used temporarerly, and will be erased.
 
@@ -226,6 +226,6 @@ For example:
 Each entry in the list corresponds to a service. Each service should have a field serviceName, indicating the name of the service as used in :ref:`annotate_method`.
 All services requiring a file will have a "url" parameter for input file.
 When chaining services, often destination of one can be used as url to then next one. The result of the last service is returned. In the case a temporary storage is
-used for intermediary results, it is possible to use the following format : **s__<number><. optional extension>__e** will generate a temporary url for the resulting file.
+used for intermediary results, it is possible to use the following format : **s__<number/GUID><.optional extension>__e** will generate a temporary url for the resulting file.
 This parameter can be reused to refer to this file during execution. The **file1** in the transcoding url part, will be replaced by the supplied file /home/centos/short_en.wav. All file form names, will be replaced automatically
 by corresponding file, by storing the files as temporary URLs.
