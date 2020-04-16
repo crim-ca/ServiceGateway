@@ -5,10 +5,10 @@
 Simple helper script to load application in development mode.
 """
 
-# -- Standard lib ------------------------------------------------------------
-import logging.config
 import argparse
 import logging
+# -- Standard lib ------------------------------------------------------------
+import logging.config
 import os
 
 THIS_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -21,6 +21,7 @@ def main():
     """
     Command line entry point.
     """
+
     log_conf_fn = os.path.join(THIS_DIR, 'ServiceGateway', 'logging.ini')
 
     parser = argparse.ArgumentParser(description=__doc__)
@@ -45,11 +46,14 @@ def main():
     logger.info("Using log configuration file {c}".
                 format(c=args.logging_conf_fn))
 
-    from ServiceGateway.rest_api import (configure_home_route, APP)
+    from ServiceGateway.rest_api import APP
+    from VestaRestPackage.generic_rest_api import configure_home_route
+
     # Must be configured also once the settings have been loaded
     configure_home_route()
 
     APP.run(host='0.0.0.0', port=args.port, debug=args.debug)
+
 
 if __name__ == '__main__':
     main()
