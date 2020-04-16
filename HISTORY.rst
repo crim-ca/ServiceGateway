@@ -3,6 +3,11 @@
 History
 =======
 
+1.9.1
+-----
+
+* Added the possibility to store all required files in service gateway temporarily
+
 1.8.6
 -----
 
@@ -16,7 +21,7 @@ History
 1.8.4
 -----
 
-* Updated VestaRestPackage to 1.9.1 with MonboDB support.
+* Updated VestaRestPackage to 1.9.1 with MongoDB support.
 
 1.8.3
 -----

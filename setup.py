@@ -14,7 +14,6 @@ except ImportError:
 
 with open('README.rst') as readme_file:
     README = readme_file.read()
-    DESC = README.split('\n')[0]
 
 with open('HISTORY.rst') as history_file:
     HISTORY = history_file.read().replace('.. :changelog:', '')
@@ -26,7 +25,7 @@ setup(
     # -- Meta information --------------------------------------------------
     name='ServiceGateway',
     version=__version__,
-    description=DESC,
+    description="This package offers a HTTP REST API to a distributed service queue Service Gateway (SG).",
     long_description=README + '\n\n' + HISTORY,
     author=__author__,
     author_email=__contact__,
