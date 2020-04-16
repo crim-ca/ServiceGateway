@@ -135,7 +135,7 @@ def add_file(filename=None):
             return url, 201
 
     else:
-        return send_from_directory(tempfile.gettempdir(), filename)
+        return send_from_directory(TMP_DIR, filename)
 
 
 def custom_stream_factory(total_content_length, filename, content_type, content_length=None):

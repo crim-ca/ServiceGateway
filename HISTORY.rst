@@ -2,6 +2,10 @@
 
 History
 =======
+1.9.2
+-----
+* Fixed a temporary files bug
+
 
 1.9.1
 -----
